@@ -43,14 +43,6 @@
 			}
 		],
 		"innerHTML": "\n\n\n\n\n\n",
-		"innerContent": [
-			"\n",
-			null,
-			"\n\n",
-			null,
-			"\n\n",
-			null,
-			"\n"
-		]
+		"innerContent": [ "\n", null, "\n\n", null, "\n\n", null, "\n" ]
 	}
 ]
