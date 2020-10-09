@@ -2,7 +2,11 @@
 	{
 		"blockName": "core/gallery",
 		"attrs": {
-			"ids": [ "1421", "1440", "1362" ],
+			"ids": [
+				"1421",
+				"1440",
+				"1362"
+			],
 			"align": "wide"
 		},
 		"innerBlocks": [],

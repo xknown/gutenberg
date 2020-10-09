@@ -2,7 +2,11 @@
 	{
 		"blockName": "core/gallery",
 		"attrs": {
-			"ids": [ 705, 704, 703 ],
+			"ids": [
+				705,
+				704,
+				703
+			],
 			"linkTo": "media"
 		},
 		"innerBlocks": [],

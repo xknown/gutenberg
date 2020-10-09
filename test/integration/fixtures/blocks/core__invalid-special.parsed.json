@@ -4,6 +4,8 @@
 		"attrs": {},
 		"innerBlocks": [],
 		"innerHTML": "<!-- wp:core/invalid-$special /-->",
-		"innerContent": [ "<!-- wp:core/invalid-$special /-->" ]
+		"innerContent": [
+			"<!-- wp:core/invalid-$special /-->"
+		]
 	}
 ]

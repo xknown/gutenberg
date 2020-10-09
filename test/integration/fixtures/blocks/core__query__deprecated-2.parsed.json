@@ -8,8 +8,13 @@
 				"pages": 0,
 				"offset": 0,
 				"postType": "post",
-				"categoryIds": [ 3, 5 ],
-				"tagIds": [ 6 ],
+				"categoryIds": [
+					3,
+					5
+				],
+				"tagIds": [
+					6
+				],
 				"order": "desc",
 				"orderBy": "date",
 				"author": "",
@@ -33,7 +38,11 @@
 					}
 				],
 				"innerHTML": "\n\n",
-				"innerContent": [ "\n", null, "\n" ]
+				"innerContent": [
+					"\n",
+					null,
+					"\n"
+				]
 			}
 		],
 		"innerHTML": "\n<div class=\"wp-block-query\">\n</div>\n",

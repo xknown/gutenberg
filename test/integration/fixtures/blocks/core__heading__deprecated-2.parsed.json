@@ -6,6 +6,8 @@
 		},
 		"innerBlocks": [],
 		"innerHTML": "\n<h2 class=\"has-accent-color\">text</h2>\n",
-		"innerContent": [ "\n<h2 class=\"has-accent-color\">text</h2>\n" ]
+		"innerContent": [
+			"\n<h2 class=\"has-accent-color\">text</h2>\n"
+		]
 	}
 ]

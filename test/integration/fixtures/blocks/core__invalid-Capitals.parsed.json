@@ -4,6 +4,8 @@
 		"attrs": {},
 		"innerBlocks": [],
 		"innerHTML": "<!-- wp:core/invalid-Capitals /-->",
-		"innerContent": [ "<!-- wp:core/invalid-Capitals /-->" ]
+		"innerContent": [
+			"<!-- wp:core/invalid-Capitals /-->"
+		]
 	}
 ]
