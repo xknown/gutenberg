@@ -155,7 +155,9 @@ export default function createReduxStore( key, options ) {
 					options.resolvers,
 					selectors,
 					store,
-					resolversCache
+					resolversCache,
+					registry,
+					key
 				);
 				resolvers = result.resolvers;
 				selectors = result.selectors;
@@ -355,12 +357,21 @@ function mapResolveSelectors( selectors, store ) {
  * Resolvers are side effects invoked once per argument set of a given selector call,
  * used in ensuring that the data needs for the selector are satisfied.
  *
- * @param {Object} resolvers      Resolvers to register.
- * @param {Object} selectors      The current selectors to be modified.
- * @param {Object} store          The redux store to which the resolvers should be mapped.
- * @param {Object} resolversCache Resolvers Cache.
+ * @param {Object}       resolvers      Resolvers to register.
+ * @param {Object}       selectors      The current selectors to be modified.
+ * @param {Object}       store          The redux store to which the resolvers should be mapped.
+ * @param {Object}       resolversCache Resolvers Cache.
+ * @param {DataRegistry} registry       Registry reference.
+ * @param {string}       storeName      Store name.
  */
-function mapResolvers( resolvers, selectors, store, resolversCache ) {
+function mapResolvers(
+	resolvers,
+	selectors,
+	store,
+	resolversCache,
+	registry,
+	storeName
+) {
 	// The `resolver` can be either a function that does the resolution, or, in more advanced
 	// cases, an object with a `fullfill` method and other optional methods like `isFulfilled`.
 	// Here we normalize the `resolver` function to an object with `fulfill` method.
@@ -384,17 +395,38 @@ function mapResolvers( resolvers, selectors, store, resolversCache ) {
 
 		const selectorResolver = ( ...args ) => {
 			async function fulfillSelector() {
-				const state = store.getState();
+				if ( resolversCache.isRunning( selectorName, args ) ) {
+					registry.__unstableSuspend(
+						registry.resolveSelect(
+							storeName,
+							selectorName,
+							...args
+						)
+					);
+					return;
+				}
 
+				const state = store.getState();
 				if (
-					resolversCache.isRunning( selectorName, args ) ||
-					( typeof resolver.isFulfilled === 'function' &&
-						resolver.isFulfilled( state, ...args ) )
+					typeof resolver.isFulfilled === 'function' &&
+					resolver.isFulfilled( state, ...args )
 				) {
 					return;
 				}
 
 				const { metadata } = store.__unstableOriginalGetState();
+				if (
+					metadataSelectors.hasFinishedResolution(
+						metadata,
+						selectorName,
+						args
+					)
+				) {
+					return;
+				}
+				registry.__unstableSuspend(
+					registry.resolveSelect( storeName, selectorName, ...args )
+				);
 
 				if (
 					metadataSelectors.hasStartedResolution(

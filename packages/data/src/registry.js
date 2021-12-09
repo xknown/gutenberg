@@ -56,6 +56,7 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	const stores = {};
 	const emitter = createEmitter();
 	const __experimentalListeningStores = new Set();
+	let __pendingSuspendedPromises = [];
 
 	/**
 	 * Global listener called for each store's update.
@@ -93,13 +94,30 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 			return store.getSelectors();
 		}
 
-		return parent && parent.select( storeName );
+		const ret = parent && parent.select( storeName );
+		__pendingSuspendedPromises = __pendingSuspendedPromises.concat(
+			parent.__unstableGetPendingSuspendedPromises()
+		);
+
+		return ret;
 	}
 
-	function __experimentalMarkListeningStores( callback, ref ) {
+	function __experimentalMarkListeningStores(
+		callback,
+		listeningStoresRef,
+		shouldBeSuspendedRef
+	) {
 		__experimentalListeningStores.clear();
+		__pendingSuspendedPromises = [];
 		const result = callback.call( this );
-		ref.current = Array.from( __experimentalListeningStores );
+		listeningStoresRef.current = Array.from(
+			__experimentalListeningStores
+		);
+		if ( shouldBeSuspendedRef ) {
+			shouldBeSuspendedRef.current = __pendingSuspendedPromises.length
+				? Promise.all( __pendingSuspendedPromises )
+				: false;
+		}
 		return result;
 	}
 
@@ -284,6 +302,9 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 		registerStore,
 		__experimentalMarkListeningStores,
 		__experimentalSubscribeStore,
+		__unstableSuspend: ( promise ) =>
+			__pendingSuspendedPromises.push( promise ),
+		__unstableGetShouldBeSuspended: () => __pendingSuspendedPromises,
 	};
 
 	//
