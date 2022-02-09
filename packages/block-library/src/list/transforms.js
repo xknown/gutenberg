@@ -163,18 +163,6 @@ const transforms = {
 		},
 		{
 			type: 'block',
-			blocks: [ 'core/quote' ],
-			transform: ( { values, anchor } ) => {
-				return createBlock( 'core/quote', {}, [
-					createBlock( 'core/list', {
-						values,
-						anchor,
-					} ),
-				] );
-			},
-		},
-		{
-			type: 'block',
 			blocks: [ 'core/pullquote' ],
 			transform: ( { values, anchor } ) => {
 				return createBlock( 'core/pullquote', {
