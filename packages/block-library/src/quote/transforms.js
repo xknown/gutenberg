@@ -6,74 +6,15 @@ import {
 	parseWithAttributeSchema,
 	rawHandler,
 	serialize,
-	switchToBlockType,
 } from '@wordpress/blocks';
-
-const toBlocksOfType = ( blocks, type ) => {
-	const result = [];
-	blocks.forEach( ( block ) => {
-		if ( type === block.name ) {
-			return result.push( block );
-		}
-		const newBlocks = switchToBlockType( block, type );
-		if ( newBlocks ) {
-			result.push( ...newBlocks.filter( Boolean ) );
-		}
-	} );
-	return result;
-};
-
-const unwrapContainers = ( blocks ) =>
-	blocks.length === 1 && blocks[ 0 ].name === 'core/group'
-		? blocks[ 0 ].innerBlocks
-		: blocks;
 
 const transforms = {
 	from: [
 		{
 			type: 'block',
-			isMultiBlock: true,
-			blocks: [ '*' ],
-			__experimentalConvert: ( blocks ) =>
-				createBlock(
-					'core/quote',
-					{},
-					unwrapContainers( blocks ).map( ( block ) =>
-						createBlock(
-							block.name,
-							block.attributes,
-							block.innerBlocks
-						)
-					)
-				),
-		},
-		{
-			type: 'block',
-			isMultiBlock: true,
-			blocks: [ 'core/paragraph' ],
-			transform: ( attributes ) => {
-				return createBlock(
-					'core/quote',
-					{},
-					attributes.map( ( props ) =>
-						createBlock( 'core/paragraph', props )
-					)
-				);
-			},
-		},
-		{
-			type: 'block',
-			isMultiBlock: true,
-			blocks: [ 'core/heading' ],
-			transform: ( attributes ) => {
-				return createBlock(
-					'core/quote',
-					{},
-					attributes.map( ( props ) =>
-						createBlock( 'core/heading', props )
-					)
-				);
-			},
+			blocks: [ 'core/group' ],
+			transform: ( {}, innerBlocks ) =>
+				createBlock( 'core/quote', {}, innerBlocks ),
 		},
 		{
 			type: 'block',
@@ -102,9 +43,32 @@ const transforms = {
 			},
 		},
 		{
+			type: 'block',
+			isMultiBlock: true,
+			blocks: [ '*' ],
+			isMatch: ( attributes, blocks ) => {
+				return ! blocks.some( ( { name } ) => name === 'core/quote' );
+			},
+			__experimentalConvert: ( blocks ) =>
+				createBlock(
+					'core/quote',
+					{},
+					blocks.map( ( block ) =>
+						createBlock(
+							block.name,
+							block.attributes,
+							block.innerBlocks
+						)
+					)
+				),
+		},
+		{
 			type: 'prefix',
 			prefix: '>',
-			transform: () => createBlock( 'core/quote' ),
+			transform: ( content ) =>
+				createBlock( 'core/quote', {}, [
+					createBlock( 'core/paragraph', { content } ),
+				] ),
 		},
 		{
 			type: 'raw',
@@ -159,60 +123,32 @@ const transforms = {
 		},
 		{
 			type: 'block',
-			blocks: [ 'core/paragraph' ],
-			transform: ( { citation }, innerBlocks ) => {
-				const paragraphs = toBlocksOfType(
-					innerBlocks,
-					'core/paragraph'
-				);
-				if ( citation && citation !== '<p></p>' ) {
-					paragraphs.push(
-						createBlock( 'core/paragraph', {
-							content: citation,
-						} )
-					);
-				}
-
-				if ( paragraphs.length === 0 ) {
-					return createBlock( 'core/paragraph', {
-						content: '',
-					} );
-				}
-				return paragraphs;
-			},
-		},
-
-		{
-			type: 'block',
-			blocks: [ 'core/heading' ],
-			transform: ( { citation }, innerBlocks ) => {
-				const result = [];
-				result.push( ...toBlocksOfType( innerBlocks, 'core/heading' ) );
-
-				if ( citation && citation !== '<p></p>' ) {
-					result.push(
-						createBlock( 'core/heading', {
-							content: citation,
-						} )
-					);
-				}
-
-				return result;
-			},
-		},
-
-		{
-			type: 'block',
 			blocks: [ 'core/pullquote' ],
-			transform: ( { citation, anchor }, innerBlocks ) => {
+			isMatch: ( attributes, block ) => {
+				return block.innerBlocks.every(
+					( { name } ) => name === 'core/paragraph'
+				);
+			},
+			transform: ( { attribution, anchor }, innerBlocks ) => {
 				return createBlock( 'core/pullquote', {
-					value: serialize(
-						toBlocksOfType( innerBlocks, 'core/paragraph' )
-					),
-					citation,
+					value: serialize( innerBlocks ),
+					attribution,
 					anchor,
 				} );
 			},
+		},
+		{
+			type: 'block',
+			blocks: [ '*' ],
+			transform: ( { attribution }, innerBlocks ) =>
+				attribution
+					? [
+							...innerBlocks,
+							createBlock( 'core/paragraph', {
+								content: attribution,
+							} ),
+					  ]
+					: innerBlocks,
 		},
 	],
 };

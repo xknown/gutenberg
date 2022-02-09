@@ -66,19 +66,6 @@ const transforms = {
 			},
 		},
 		{
-			type: 'block',
-			blocks: [ 'core/quote', 'core/pullquote' ],
-			transform: ( { value, anchor } ) => {
-				return createBlock( 'core/list', {
-					values: toHTMLString( {
-						value: create( { html: value, multilineTag: 'p' } ),
-						multilineTag: 'li',
-					} ),
-					anchor,
-				} );
-			},
-		},
-		{
 			type: 'raw',
 			selector: 'ol,ul',
 			schema: ( args ) => ( {
@@ -178,17 +165,12 @@ const transforms = {
 			type: 'block',
 			blocks: [ 'core/quote' ],
 			transform: ( { values, anchor } ) => {
-				return createBlock( 'core/quote', {
-					value: toHTMLString( {
-						value: create( {
-							html: values,
-							multilineTag: 'li',
-							multilineWrapperTags: [ 'ul', 'ol' ],
-						} ),
-						multilineTag: 'p',
+				return createBlock( 'core/quote', {}, [
+					createBlock( 'core/list', {
+						values,
+						anchor,
 					} ),
-					anchor,
-				} );
+				] );
 			},
 		},
 		{

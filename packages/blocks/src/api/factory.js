@@ -205,6 +205,7 @@ const isPossibleTransformForSource = ( transform, direction, blocks ) => {
 		direction !== 'from' ||
 		transform.blocks.indexOf( sourceBlock.name ) !== -1 ||
 		isWildcardBlockTransform( transform );
+
 	if ( ! hasMatchingName ) {
 		return false;
 	}
@@ -307,7 +308,9 @@ const getBlockTypesForPossibleToTransforms = ( blocks ) => {
 	);
 
 	// Map block names to block types.
-	return blockNames.map( ( name ) => getBlockType( name ) );
+	return blockNames.map( ( name ) =>
+		name === '*' ? name : getBlockType( name )
+	);
 };
 
 /**
@@ -541,10 +544,9 @@ export function switchToBlockType( blocks, name ) {
 		return null;
 	}
 
-	const hasSwitchedBlock = some(
-		transformationResults,
-		( result ) => result.name === name
-	);
+	const hasSwitchedBlock =
+		name === '*' ||
+		some( transformationResults, ( result ) => result.name === name );
 
 	// Ensure that at least one block object returned by the transformation has
 	// the expected "destination" block type.
