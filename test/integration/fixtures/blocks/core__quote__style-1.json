@@ -4,7 +4,7 @@
 		"name": "core/quote",
 		"isValid": true,
 		"attributes": {
-			"citation": "Matt Mullenweg, 2017"
+			"attribution": "Matt Mullenweg, 2017"
 		},
 		"innerBlocks": [
 			{
