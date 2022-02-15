@@ -6,7 +6,6 @@ import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalBoxControl as BoxControl,
-	__experimentalUnitControl as UnitControl,
 	__experimentalUseCustomUnits as useCustomUnits,
 } from '@wordpress/components';
 import { __experimentalUseCustomSides as useCustomSides } from '@wordpress/block-editor';
@@ -129,14 +128,31 @@ export default function DimensionsPanel( { name } ) {
 	const hasMarginValue = () =>
 		!! marginValues && Object.keys( marginValues ).length;
 
-	const [ gapValue, setGapValue ] = useStyle( 'spacing.blockGap', name );
-	const resetGapValue = () => setGapValue( undefined );
-	const hasGapValue = () => !! gapValue;
+	const [ rawBlockGap, setRawBlockGap ] = useStyle(
+		'spacing.blockGap',
+		name
+	);
+	const blockGapValues = splitStyleValue( rawBlockGap );
+	const blockGapSides = useCustomSides( name, 'blockGap' );
+	const isAxialBlockGap =
+		blockGapSides &&
+		blockGapSides.some( ( side ) => AXIAL_SIDES.includes( side ) );
+
+	const setBlockGapValues = ( newBlockGapValues ) => {
+		const blockGap = filterValuesBySides(
+			newBlockGapValues,
+			blockGapSides
+		);
+		setRawBlockGap( blockGap );
+	};
+	const resetBlockGapValue = () => setBlockGapValues( {} );
+	const hasBlockGapValue = () =>
+		!! blockGapValues && Object.keys( blockGapValues ).length;
 
 	const resetAll = () => {
 		resetPaddingValue();
 		resetMarginValue();
-		resetGapValue();
+		resetBlockGapValue();
 	};
 
 	return (
@@ -179,18 +195,19 @@ export default function DimensionsPanel( { name } ) {
 			) }
 			{ showGapControl && (
 				<ToolsPanelItem
-					hasValue={ hasGapValue }
+					hasValue={ hasBlockGapValue }
 					label={ __( 'Block spacing' ) }
-					onDeselect={ resetGapValue }
+					onDeselect={ resetBlockGapValue }
 					isShownByDefault={ true }
 				>
-					<UnitControl
+					<BoxControl
+						values={ blockGapValues }
+						onChange={ setBlockGapValues }
 						label={ __( 'Block spacing' ) }
-						__unstableInputWidth="80px"
-						min={ 0 }
-						onChange={ setGapValue }
+						sides={ blockGapSides }
 						units={ units }
-						value={ gapValue }
+						allowReset={ false }
+						splitOnAxis={ isAxialBlockGap }
 					/>
 				</ToolsPanelItem>
 			) }
