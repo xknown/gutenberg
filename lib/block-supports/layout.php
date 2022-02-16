@@ -67,7 +67,7 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 		$style .= "$selector .alignright { float: right; margin-left: 2em; margin-right: 0; }";
 		if ( $has_block_gap_support ) {
 			if ( is_array( $gap_value ) ) {
-				$gap_value = $gap_value['top'] ?? null;
+				$gap_value = isset( $gap_value['top'] ) ? $gap_value['top'] : null;
 			}
 			$gap_style = $gap_value ? $gap_value : 'var( --wp--style--block-gap )';
 			$style    .= "$selector > * { margin-top: 0; margin-bottom: 0; }";
