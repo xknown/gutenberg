@@ -116,7 +116,7 @@ export default function BlockToolbar( { hideDragHandle } ) {
 						<BlockSwitcher clientIds={ blockClientIds } />
 						<BlockMover
 							clientIds={ blockClientIds }
-							hideDragHandle={ hideDragHandle || hasReducedUI }
+							hideDragHandle={ hideDragHandle }
 						/>
 					</ToolbarGroup>
 				) }
