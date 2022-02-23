@@ -28,14 +28,15 @@ function gutenberg_register_layout_support( $block_type ) {
 /**
  * Generates the CSS corresponding to the provided layout.
  *
- * @param string  $selector CSS selector.
- * @param array   $layout   Layout object. The one that is passed has already checked the existence of default block layout.
- * @param boolean $has_block_gap_support Whether the theme has support for the block gap.
- * @param string  $gap_value The block gap value to apply.
+ * @param string  $selector                      CSS selector.
+ * @param array   $layout                        Layout object. The one that is passed has already checked the existence of default block layout.
+ * @param boolean $has_block_gap_support         Whether the theme has support for the block gap.
+ * @param string  $gap_value                     The block gap value to apply.
+ * @param boolean $should_skip_gap_serialization Whether to skip applying the user-defined value set in the editor.
  *
- * @return string CSS style.
+ * @return string                                CSS style.
  */
-function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support = false, $gap_value = null ) {
+function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support = false, $gap_value = null, $should_skip_gap_serialization = false ) {
 	$layout_type = isset( $layout['type'] ) ? $layout['type'] : 'default';
 
 	$style = '';
@@ -65,7 +66,7 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 		$style .= "$selector .alignleft { float: left; margin-inline-start: 0; margin-inline-end: 2em; }";
 		$style .= "$selector .alignright { float: right; margin-inline-start: 2em; margin-inline-end: 0; }";
 		if ( $has_block_gap_support ) {
-			$gap_style = $gap_value ? $gap_value : 'var( --wp--style--block-gap )';
+			$gap_style = $gap_value && ! $should_skip_gap_serialization ? $gap_value : 'var( --wp--style--block-gap )';
 			$style    .= "$selector > * { margin-block-start: 0; margin-block-end: 0; }";
 			$style    .= "$selector > * + * { margin-block-start: $gap_style; margin-block-end: 0; }";
 		}
@@ -90,7 +91,7 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 		$style  = "$selector {";
 		$style .= 'display: flex;';
 		if ( $has_block_gap_support ) {
-			$gap_style = $gap_value ? $gap_value : 'var( --wp--style--block-gap, 0.5em )';
+			$gap_style = $gap_value && ! $should_skip_gap_serialization ? $gap_value : 'var( --wp--style--block-gap, 0.5em )';
 			$style    .= "gap: $gap_style;";
 		} else {
 			$style .= 'gap: 0.5em;';
@@ -155,7 +156,10 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	// Regex for CSS value borrowed from `safecss_filter_attr`, and used here
 	// because we only want to match against the value, not the CSS attribute.
 	$gap_value = preg_match( '%[\\\(&=}]|/\*%', $gap_value ) ? null : $gap_value;
-	$style     = gutenberg_get_layout_style( ".$class_name", $used_layout, $has_block_gap_support, $gap_value );
+	// If a block's block.json skips serialization for spacing or spacing.blockGap,
+	// don't apply the user-defined value to the styles.
+	$should_skip_gap_serialization = gutenberg_skip_spacing_serialization( $block_type, 'blockGap' );
+	$style                         = gutenberg_get_layout_style( ".$class_name", $used_layout, $has_block_gap_support, $gap_value, $should_skip_gap_serialization );
 	// This assumes the hook only applies to blocks with a single wrapper.
 	// I think this is a reasonable limitation for that particular hook.
 	$content = preg_replace(
