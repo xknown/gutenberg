@@ -74,6 +74,15 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 		};
 	}, [] );
 
+	const { __experimentalBlockPatterns: settingsBlockPatterns } = settings;
+	const { blockPatterns } = useSelect(
+		( select ) => ( {
+			blockPatterns:
+				settingsBlockPatterns ?? select( coreStore ).getBlockPatterns(),
+		} ),
+		[ settingsBlockPatterns ]
+	);
+
 	const { undo } = useDispatch( editorStore );
 
 	const { saveEntityRecord } = useDispatch( coreStore );
@@ -99,7 +108,6 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 			...pick( settings, [
 				'__experimentalBlockDirectory',
 				'__experimentalBlockPatternCategories',
-				'__experimentalBlockPatterns',
 				'__experimentalDiscussionSettings',
 				'__experimentalFeatures',
 				'__experimentalPreferredStyleVariations',
@@ -140,6 +148,7 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 			] ),
 			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,
 			__experimentalReusableBlocks: reusableBlocks,
+			__experimentalBlockPatterns: blockPatterns,
 			__experimentalFetchLinkSuggestions: ( search, searchOptions ) =>
 				fetchLinkSuggestions( search, searchOptions, settings ),
 			__experimentalFetchRichUrlData: fetchUrlData,
@@ -155,6 +164,7 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 			settings,
 			hasUploadPermissions,
 			reusableBlocks,
+			blockPatterns,
 			canUseUnfilteredHTML,
 			undo,
 			hasTemplate,
