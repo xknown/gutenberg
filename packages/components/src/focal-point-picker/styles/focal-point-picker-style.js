@@ -9,6 +9,7 @@ import styled from '@emotion/styled';
 import { Flex } from '../../flex';
 import BaseUnitControl from '../../unit-control';
 import { COLORS } from '../../utils';
+import { INITIAL_BOUNDS } from '../utils';
 
 export const MediaWrapper = styled.div`
 	background-color: transparent;
@@ -45,9 +46,9 @@ export const MediaContainer = styled.div`
 export const MediaPlaceholder = styled.div`
 	background: ${ COLORS.lightGray[ 300 ] };
 	box-sizing: border-box;
-	height: 170px;
+	height: ${ INITIAL_BOUNDS.height }px;
 	max-width: 280px;
-	min-width: 200px;
+	min-width: ${ INITIAL_BOUNDS.width }px;
 	width: 100%;
 `;
 

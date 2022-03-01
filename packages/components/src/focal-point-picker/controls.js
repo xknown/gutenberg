@@ -22,19 +22,19 @@ const TEXTCONTROL_MAX = 100;
 
 export default function FocalPointPickerControls( {
 	onChange = noop,
-	percentages = {
+	point = {
 		x: 0.5,
 		y: 0.5,
 	},
 } ) {
-	const valueX = fractionToPercentage( percentages.x );
-	const valueY = fractionToPercentage( percentages.y );
+	const valueX = fractionToPercentage( point.x );
+	const valueY = fractionToPercentage( point.y );
 
 	const handleChange = ( value, axis ) => {
 		const num = parseInt( value, 10 );
 
 		if ( ! isNaN( num ) ) {
-			onChange( { ...percentages, [ axis ]: num / 100 } );
+			onChange( { ...point, [ axis ]: num / 100 } );
 		}
 	};
 

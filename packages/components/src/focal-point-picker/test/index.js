@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { act, fireEvent, render } from '@testing-library/react';
+import { fireEvent, render } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -34,7 +34,8 @@ describe( 'FocalPointPicker', () => {
 		} );
 
 		it( 'should stop a drag operation when focus is lost', () => {
-			expect( firedDragEnd && ! firedDrag ).toBe( true );
+			expect( firedDrag ).toBe( undefined );
+			expect( firedDragEnd ).toBe( true );
 		} );
 	} );
 
@@ -49,11 +50,9 @@ describe( 'FocalPointPicker', () => {
 			} );
 			const { getByRole } = render( <Picker { ...handlers } /> );
 			const dragArea = getByRole( 'button' );
-			act( () => {
-				fireEvent.mouseDown( dragArea );
-				fireEvent.mouseMove( dragArea );
-				fireEvent.mouseUp( dragArea );
-			} );
+			fireEvent.mouseDown( dragArea );
+			fireEvent.mouseMove( dragArea );
+			fireEvent.mouseUp( dragArea );
 			expect(
 				events.reduce( ( last, eventName, index ) => {
 					return last && logs[ index ].name === eventName;
@@ -76,12 +75,10 @@ describe( 'FocalPointPicker', () => {
 					} }
 				/>
 			);
-			// Click and press arrow up
 			const dragArea = getByRole( 'button' );
-			act( () => {
-				fireEvent.mouseDown( dragArea );
-				fireEvent.keyDown( dragArea, { charCode: 0, keyCode: 38 } );
-			} );
+			fireEvent.mouseDown( dragArea, { clientX: 1, clientY: 1 } );
+			// Change doesn't fire until mouseup
+			fireEvent.mouseUp( dragArea );
 			expect( spy ).toHaveBeenCalled();
 			expect( spyChange ).toHaveBeenCalledWith( {
 				x: '0.91',
@@ -104,12 +101,10 @@ describe( 'FocalPointPicker', () => {
 			const { getByRole } = render(
 				<Picker value={ { x: 0.14, y: 0.62 } } onChange={ spyChange } />
 			);
-			// Click and press arrow up
+			// Focus and press arrow up
 			const dragArea = getByRole( 'button' );
-			act( () => {
-				fireEvent.mouseDown( dragArea );
-				fireEvent.keyDown( dragArea, { charCode: 0, keyCode: 38 } );
-			} );
+			dragArea.focus();
+			fireEvent.keyDown( dragArea, { charCode: 0, keyCode: 38 } );
 			expect( spyChange ).toHaveBeenCalledWith( {
 				x: '0.14',
 				y: '0.61',

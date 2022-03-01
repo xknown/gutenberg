@@ -16,11 +16,7 @@ import { useUpdateEffect } from '../utils/hooks';
 const { clearTimeout, setTimeout } =
 	typeof window !== 'undefined' ? window : {};
 
-export default function FocalPointPickerGrid( {
-	bounds = {},
-	value,
-	...props
-} ) {
+export default function FocalPointPickerGrid( { bounds, value, ...props } ) {
 	const animationProps = useRevealAnimation( value );
 	const style = {
 		width: bounds.width,
