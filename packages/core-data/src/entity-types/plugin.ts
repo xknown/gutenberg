@@ -1,9 +1,14 @@
 /**
  * Internal dependencies
  */
-import { Context, ContextualField, RenderedText, OmitNevers } from './helpers';
+import type {
+	Context,
+	ContextualField,
+	RenderedText,
+	OmitNevers,
+} from './helpers';
 
-import { BaseEntityTypes as _BaseEntityTypes } from './base-entity-types';
+import type { BaseEntityTypes as _BaseEntityTypes } from './base-entity-types';
 
 declare module './base-entity-types' {
 	export namespace BaseEntityTypes {

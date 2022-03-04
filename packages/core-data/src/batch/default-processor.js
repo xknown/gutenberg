@@ -36,7 +36,7 @@ export default async function defaultProcessor( requests ) {
 
 	const results = [];
 
-	for ( const batchRequests of chunk( requests, maxItems ) ) {
+	for ( const batchRequests of chunk( requests, maxItems ?? undefined ) ) {
 		const batchResponse = await apiFetch( {
 			path: '/batch/v1',
 			method: 'POST',

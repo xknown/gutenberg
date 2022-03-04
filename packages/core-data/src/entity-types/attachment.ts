@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import {
+import type {
 	Context,
 	ContextualField,
 	MediaType,
@@ -12,7 +12,7 @@ import {
 	PingStatus,
 } from './helpers';
 
-import { BaseEntityTypes as _BaseEntityTypes } from './base-entity-types';
+import type { BaseEntityTypes as _BaseEntityTypes } from './base-entity-types';
 
 declare module './base-entity-types' {
 	export namespace BaseEntityTypes {

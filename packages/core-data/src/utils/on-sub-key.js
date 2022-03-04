@@ -4,7 +4,7 @@
  *
  * @param {string} actionProperty Action property by which to key object.
  *
- * @return {Function} Higher-order reducer.
+ * @return {(state: any, action: any) => any} Higher-order reducer.
  */
 export const onSubKey = ( actionProperty ) => ( reducer ) => (
 	state = {},

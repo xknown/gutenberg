@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import {
+import type {
 	Context,
 	PostStatus,
 	RenderedText,
@@ -9,11 +9,11 @@ import {
 	ContextualField,
 } from './helpers';
 
-import { BaseEntityTypes as _BaseEntityTypes } from './base-entity-types';
+import type { BaseEntityTypes as _BaseEntityTypes } from './base-entity-types';
 
 declare module './base-entity-types' {
 	export namespace BaseEntityTypes {
-		export interface WpTemplate< C extends Context > {
+		export interface WpTemplatePart< C extends Context > {
 			/**
 			 * ID of template.
 			 */
@@ -82,13 +82,13 @@ declare module './base-entity-types' {
 			 */
 			author: number;
 			/**
-			 * Whether a template is a custom template.
+			 * Where the template part is intended for use (header, footer, etc.)
 			 */
-			is_custom: Record< string, string >;
+			area: string;
 		}
 	}
 }
 
-export type WpTemplate< C extends Context > = OmitNevers<
-	_BaseEntityTypes.WpTemplate< C >
+export type WpTemplatePart< C extends Context > = OmitNevers<
+	_BaseEntityTypes.WpTemplatePart< C >
 >;

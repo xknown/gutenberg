@@ -1,9 +1,14 @@
 /**
  * Internal dependencies
  */
-import { RenderedText, Context, ContextualField, OmitNevers } from './helpers';
+import type {
+	RenderedText,
+	Context,
+	ContextualField,
+	OmitNevers,
+} from './helpers';
 
-import { BaseEntityTypes as _BaseEntityTypes } from './base-entity-types';
+import type { BaseEntityTypes as _BaseEntityTypes } from './base-entity-types';
 
 export type NavMenuItemType =
 	| 'taxonomy'

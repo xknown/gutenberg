@@ -15,6 +15,7 @@ import isShallowEqual from '@wordpress/is-shallow-equal';
 import { ifMatchingAction, replaceAction } from './utils';
 import { reducer as queriedDataReducer } from './queried-data';
 import { defaultEntities, DEFAULT_ENTITY_KEY } from './entities';
+import type { EntityDeclaration } from './types';
 
 /**
  * Reducer managing terms state. Keyed by taxonomy slug, the value is either
@@ -105,10 +106,10 @@ export function taxonomies( state = [], action ) {
 /**
  * Reducer managing the current theme.
  *
- * @param {string} state  Current state.
- * @param {Object} action Dispatched action.
+ * @param {string | undefined} state  Current state.
+ * @param {Object}             action Dispatched action.
  *
- * @return {string} Updated state.
+ * @return {string | undefined} Updated state.
  */
 export function currentTheme( state = undefined, action ) {
 	switch ( action.type ) {
@@ -122,10 +123,10 @@ export function currentTheme( state = undefined, action ) {
 /**
  * Reducer managing the current global styles id.
  *
- * @param {string} state  Current state.
- * @param {Object} action Dispatched action.
+ * @param {string | undefined} state  Current state.
+ * @param {Object}             action Dispatched action.
  *
- * @return {string} Updated state.
+ * @return {string | undefined} Updated state.
  */
 export function currentGlobalStylesId( state = undefined, action ) {
 	switch ( action.type ) {
@@ -139,10 +140,10 @@ export function currentGlobalStylesId( state = undefined, action ) {
 /**
  * Reducer managing the theme base global styles.
  *
- * @param {string} state  Current state.
- * @param {Object} action Dispatched action.
+ * @param {Record<string, object>} state  Current state.
+ * @param {Object}                 action Dispatched action.
  *
- * @return {string} Updated state.
+ * @return {Record<string, object>} Updated state.
  */
 export function themeBaseGlobalStyles( state = {}, action ) {
 	switch ( action.type ) {
@@ -159,10 +160,10 @@ export function themeBaseGlobalStyles( state = {}, action ) {
 /**
  * Reducer managing the theme global styles variations.
  *
- * @param {string} state  Current state.
- * @param {Object} action Dispatched action.
+ * @param {Record<string, object>} state  Current state.
+ * @param {Object}                 action Dispatched action.
  *
- * @return {string} Updated state.
+ * @return {Record<string, object>} Updated state.
  */
 export function themeGlobalStyleVariations( state = {}, action ) {
 	switch ( action.type ) {
@@ -330,12 +331,15 @@ function entity( entityConfig ) {
 /**
  * Reducer keeping track of the registered entities.
  *
- * @param {Object} state  Current state.
+ * @param          state  Current state.
  * @param {Object} action Dispatched action.
  *
  * @return {Object} Updated state.
  */
-export function entitiesConfig( state = defaultEntities, action ) {
+export function entitiesConfig(
+	state: EntityDeclaration[] = defaultEntities,
+	action
+) {
 	switch ( action.type ) {
 		case 'ADD_ENTITIES':
 			return [ ...state, ...action.entities ];
@@ -344,15 +348,24 @@ export function entitiesConfig( state = defaultEntities, action ) {
 	return state;
 }
 
+interface EntityConfigState {
+	config: EntityDeclaration[];
+	data: Record< string, unknown >;
+	reducer: Function;
+}
+
 /**
  * Reducer keeping track of the registered entities config and data.
  *
- * @param {Object} state  Current state.
+ * @param          state  Current state.
  * @param {Object} action Dispatched action.
  *
- * @return {Object} Updated state.
+ * @return Updated state.
  */
-export const entities = ( state = {}, action ) => {
+export const entities = (
+	state = {} as EntityConfigState,
+	action
+): EntityConfigState => {
 	const newConfig = entitiesConfig( state.config, action );
 
 	// Generates a dynamic reducer for the entities.
@@ -380,7 +393,7 @@ export const entities = ( state = {}, action ) => {
 		);
 	}
 
-	const newData = entitiesDataReducer( state.data, action );
+	const newData = entitiesDataReducer!( state.data, action );
 
 	if (
 		newData === state.data &&
@@ -397,17 +410,23 @@ export const entities = ( state = {}, action ) => {
 	};
 };
 
+interface UndoState extends Array< object > {
+	offset?: number;
+	flattenedUndo?: object;
+}
+
+const UNDO_INITIAL_STATE: UndoState = [];
+UNDO_INITIAL_STATE.offset = 0;
+let lastEditAction;
+
 /**
  * Reducer keeping track of entity edit undo history.
  *
- * @param {Object} state  Current state.
+ * @param {UndoState} state  Current state.
  * @param {Object} action Dispatched action.
  *
- * @return {Object} Updated state.
+ * @return {UndoState} Updated state.
  */
-const UNDO_INITIAL_STATE = [];
-UNDO_INITIAL_STATE.offset = 0;
-let lastEditAction;
 export function undo( state = UNDO_INITIAL_STATE, action ) {
 	switch ( action.type ) {
 		case 'EDIT_ENTITY_RECORD':
@@ -443,7 +462,7 @@ export function undo( state = UNDO_INITIAL_STATE, action ) {
 			if ( isUndoOrRedo ) {
 				nextState = [ ...state ];
 				nextState.offset =
-					state.offset + ( action.meta.isUndo ? -1 : 1 );
+					state.offset! + ( action.meta.isUndo ? -1 : 1 );
 
 				if ( state.flattenedUndo ) {
 					// The first undo in a sequence of undos might happen while we have

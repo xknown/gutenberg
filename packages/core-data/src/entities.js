@@ -275,7 +275,7 @@ export const getMethodName = (
 	const nameSuffix =
 		upperFirst( camelCase( name ) ) + ( usePlural ? 's' : '' );
 	const suffix =
-		usePlural && entity.plural
+		usePlural && entity?.plural
 			? upperFirst( camelCase( entity.plural ) )
 			: nameSuffix;
 	return `${ prefix }${ kindPrefix }${ suffix }`;
@@ -286,7 +286,7 @@ export const getMethodName = (
  *
  * @param {string} kind Kind
  *
- * @return {Array} Entities
+ * @return {( thunkArgs: any ) => Promise<any[]>} Entities
  */
 export const getKindEntities = ( kind ) => async ( { select, dispatch } ) => {
 	let entities = select.getEntitiesByKind( kind );

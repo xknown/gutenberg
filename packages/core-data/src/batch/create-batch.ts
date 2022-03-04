@@ -106,7 +106,7 @@ export default function createBatch( processor = defaultProcessor ) {
 		 */
 		async run() {
 			if ( pending.size ) {
-				await new Promise( ( resolve ) => {
+				await new Promise< void >( ( resolve ) => {
 					const unsubscribe = pending.subscribe( () => {
 						if ( ! pending.size ) {
 							unsubscribe();
@@ -160,7 +160,10 @@ export default function createBatch( processor = defaultProcessor ) {
 	};
 }
 
-class ObservableSet {
+class ObservableSet< T > {
+	private set: Set< T >;
+	private subscribers: Set< () => void >;
+
 	constructor( ...args ) {
 		this.set = new Set( ...args );
 		this.subscribers = new Set();

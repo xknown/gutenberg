@@ -83,14 +83,18 @@ interface EnrichedSelectors {
 	[ key: string ]: QuerySelector;
 }
 
+interface EnrichSelectors {
+	( selectors: Record< string, Function > ): EnrichedSelectors;
+}
+
 /**
  * Transform simple selectors into ones that return an object with the
  * original return value AND the resolution info.
  *
- * @param {Object} selectors Selectors to enrich
- * @return {EnrichedSelectors} Enriched selectors
+ * @param  selectors Selectors to enrich
+ * @return Enriched  selectors
  */
-const enrichSelectors = memoize( ( selectors ) => {
+const enrichSelectors: EnrichSelectors = memoize( ( selectors ) => {
 	const resolvers = {};
 	for ( const selectorName in selectors ) {
 		if ( META_SELECTORS.includes( selectorName ) ) {

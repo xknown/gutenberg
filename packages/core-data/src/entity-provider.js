@@ -27,7 +27,9 @@ const entities = {
 		if ( ! acc[ entity.kind ] ) {
 			acc[ entity.kind ] = {};
 		}
-		acc[ entity.kind ][ entity.name ] = { context: createContext() };
+		acc[ entity.kind ][ entity.name ] = {
+			context: createContext( undefined ),
+		};
 		return acc;
 	}, {} ),
 	...kinds.reduce( ( acc, kind ) => {
@@ -41,7 +43,7 @@ const getEntity = ( kind, type ) => {
 	}
 
 	if ( ! entities[ kind ][ type ] ) {
-		entities[ kind ][ type ] = { context: createContext() };
+		entities[ kind ][ type ] = { context: createContext( undefined ) };
 	}
 
 	return entities[ kind ][ type ];
@@ -125,6 +127,10 @@ export function useEntityProp( kind, type, prop, _id ) {
 
 	return [ value, setValue, fullValue ];
 }
+
+/** @typedef {Object} WPBlock A loaded block in memory
+ *  @property {string} name Block name
+ */
 
 /**
  * Hook that returns block content getters and setters for

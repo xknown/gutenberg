@@ -1,14 +1,14 @@
 /**
  * Internal dependencies
  */
-import {
+import type {
 	AvatarUrls,
 	Context,
 	ContextualField,
 	OmitNevers,
 	RenderedText,
 } from './helpers';
-import { BaseEntityTypes as _BaseEntityTypes } from './base-entity-types';
+import type { BaseEntityTypes as _BaseEntityTypes } from './base-entity-types';
 
 export type CommentStatus = 'hold' | 'approve' | 'spam' | 'trash' | '1' | '0';
 

@@ -7,7 +7,7 @@ import { set, map, find, get, filter, compact } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { createRegistrySelector } from '@wordpress/data';
+import { DataRegistry, createRegistrySelector } from '@wordpress/data';
 import { addQueryArgs } from '@wordpress/url';
 import deprecated from '@wordpress/deprecated';
 
@@ -18,6 +18,11 @@ import { STORE_NAME } from './name';
 import { getQueriedItems } from './queried-data';
 import { DEFAULT_ENTITY_KEY } from './entities';
 import { getNormalizedCommaSeparable, isRawAttribute } from './utils';
+
+import type { EntityDeclaration } from './types';
+
+const dr = {} as DataRegistry;
+dr.test();
 
 /**
  * Shared reference to an empty object for cases where it is important to avoid
@@ -157,6 +162,11 @@ export const getEntityRecord = createSelector(
 		if ( item && query._fields ) {
 			const filteredItem = {};
 			const fields = getNormalizedCommaSeparable( query._fields );
+
+			if ( null === fields ) {
+				return filteredItem;
+			}
+
 			for ( let f = 0; f < fields.length; f++ ) {
 				const field = fields[ f ].split( '.' );
 				const value = get( item, field );
@@ -310,14 +320,14 @@ export function getEntityRecords( state, kind, name, query ) {
  *
  * @param {Object} state State tree.
  *
- * @return {[{ title: string, key: string, name: string, kind: string }]} The list of updated records
+ * @return {EntityDeclaration[]} The list of updated records
  */
 export const __experimentalGetDirtyEntityRecords = createSelector(
 	( state ) => {
 		const {
 			entities: { data },
 		} = state;
-		const dirtyRecords = [];
+		const dirtyRecords: EntityDeclaration[] = [];
 		Object.keys( data ).forEach( ( kind ) => {
 			Object.keys( data[ kind ] ).forEach( ( name ) => {
 				const primaryKeys = Object.keys(
@@ -365,14 +375,14 @@ export const __experimentalGetDirtyEntityRecords = createSelector(
  *
  * @param {Object} state State tree.
  *
- * @return {[{ title: string, key: string, name: string, kind: string }]} The list of records being saved.
+ * @return {EntityDeclaration[]} The list of records being saved.
  */
 export const __experimentalGetEntitiesBeingSaved = createSelector(
 	( state ) => {
 		const {
 			entities: { data },
 		} = state;
-		const recordsBeingSaved = [];
+		const recordsBeingSaved: EntityDeclaration[] = [];
 		Object.keys( data ).forEach( ( kind ) => {
 			Object.keys( data[ kind ] ).forEach( ( name ) => {
 				const primaryKeys = Object.keys(
