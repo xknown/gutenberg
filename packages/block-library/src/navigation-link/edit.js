@@ -325,7 +325,6 @@ export default function NavigationLinkEdit( {
 	onReplace,
 	context,
 	clientId,
-	maxNestingLevel = 5,
 } ) {
 	const {
 		label,
@@ -337,6 +336,8 @@ export default function NavigationLinkEdit( {
 		title,
 		kind,
 	} = attributes;
+
+	const { maxNestingLevel } = context;
 
 	const link = {
 		url,
