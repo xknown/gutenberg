@@ -68,7 +68,6 @@ function InputField(
 		pressEnter,
 		pressUp,
 		reset,
-		update,
 	} = useInputControlStateReducer( stateReducer, {
 		isDragEnabled,
 		value: valueProp,
@@ -92,7 +91,7 @@ function InputField(
 			return;
 		}
 		if ( ! isFocused && ! wasDirtyOnBlur.current ) {
-			update( valueProp, _event as SyntheticEvent );
+			commit( valueProp, _event as SyntheticEvent );
 		} else if ( ! isDirty ) {
 			onChange( value, {
 				event: _event as ChangeEvent< HTMLInputElement >,
