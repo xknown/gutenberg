@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+-   `isValidBlockContent` has been removed. Please use `validateBlock`.
+
 ## 11.2.0 (2022-01-27)
 
 ## 11.1.0 (2021-09-09)
