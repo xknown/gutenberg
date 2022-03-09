@@ -37,6 +37,7 @@ function wp_webfonts() {
  * wp_register_webfonts(
  *      array(
  *          array(
+ *              'id'          => 'source-serif-200-900-normal',
  *              'provider'    => 'local',
  *              'font_family' => 'Source Serif Pro',
  *              'font_weight' => '200 900',
@@ -44,6 +45,7 @@ function wp_webfonts() {
  *              'src'         => get_theme_file_uri( 'assets/fonts/source-serif-pro/SourceSerif4Variable-Roman.ttf.woff2' ),
  *          ),
  *          array(
+ *              'id'          => 'source-serif-200-900-italic',
  *              'provider'    => 'local',
  *              'font_family' => 'Source Serif Pro',
  *              'font_weight' => '200 900',
@@ -66,7 +68,10 @@ function wp_webfonts() {
  */
 function wp_register_webfonts( array $webfonts = array() ) {
 	foreach ( $webfonts as $webfont ) {
-		wp_register_webfont( $webfont );
+		$id = $webfont['id'];
+		unset( $webfont['id'] );
+
+		wp_register_webfont( $id, $webfont );
 	}
 }
 
