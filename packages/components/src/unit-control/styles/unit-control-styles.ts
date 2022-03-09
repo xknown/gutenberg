@@ -103,8 +103,9 @@ export const UnitLabel = styled.div< SelectProps >`
 export const UnitSelect = styled.select< SelectProps >`
 	&&& {
 		${ baseUnitLabelStyles };
+		padding: 0;
 		cursor: pointer;
-		border: 1px solid transparent;
+		border: 2px solid transparent;
 		height: 100%;
 
 		&:hover {
@@ -115,6 +116,7 @@ export const UnitSelect = styled.select< SelectProps >`
 			border-color: ${ COLORS.ui.borderFocus };
 			outline: 2px solid transparent;
 			outline-offset: 0;
+			z-index: 1;
 		}
 
 		&:disabled {
