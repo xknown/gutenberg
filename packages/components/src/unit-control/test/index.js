@@ -6,7 +6,7 @@ import { render, fireEvent, screen } from '@testing-library/react';
 /**
  * WordPress dependencies
  */
-import { UP, DOWN, ENTER, ESCAPE } from '@wordpress/keycodes';
+import { UP, DOWN, ESCAPE } from '@wordpress/keycodes';
 import { useState } from '@wordpress/element';
 
 /**
@@ -190,9 +190,9 @@ describe( 'UnitControl', () => {
 			const input = getInput();
 			input.focus();
 
-			fireEvent.change( input, { target: { value: '300px' } } );
+			fireEvent.change( input, { target: { value: '300' } } );
 
-			expect( input.value ).toBe( '300px' );
+			expect( input.value ).toBe( '300' );
 			expect( state ).toBe( 50 );
 
 			fireKeyDown( { keyCode: ESCAPE } );
@@ -342,96 +342,6 @@ describe( 'UnitControl', () => {
 	} );
 
 	describe( 'Unit Parser', () => {
-		let state = '10px';
-		const setState = jest.fn( ( nextState ) => ( state = nextState ) );
-
-		it( 'should parse unit from input', () => {
-			render(
-				<UnitControl
-					value={ state }
-					onChange={ setState }
-					isPressEnterToChange
-				/>
-			);
-
-			const input = getInput();
-			input.focus();
-			fireEvent.change( input, { target: { value: '55 em' } } );
-			fireKeyDown( { keyCode: ENTER } );
-
-			expect( state ).toBe( '55em' );
-		} );
-
-		it( 'should parse PX unit from input', () => {
-			render(
-				<UnitControl
-					value={ state }
-					onChange={ setState }
-					isPressEnterToChange
-				/>
-			);
-
-			const input = getInput();
-			input.focus();
-			fireEvent.change( input, { target: { value: '61   PX' } } );
-			fireKeyDown( { keyCode: ENTER } );
-
-			expect( state ).toBe( '61px' );
-		} );
-
-		it( 'should parse EM unit from input', () => {
-			render(
-				<UnitControl
-					value={ state }
-					onChange={ setState }
-					isPressEnterToChange
-				/>
-			);
-
-			const input = getInput();
-			input.focus();
-			fireEvent.change( input, { target: { value: '55 em' } } );
-			fireKeyDown( { keyCode: ENTER } );
-
-			expect( state ).toBe( '55em' );
-		} );
-
-		it( 'should parse % unit from input', () => {
-			render(
-				<UnitControl
-					value={ state }
-					onChange={ setState }
-					isPressEnterToChange
-				/>
-			);
-
-			const input = getInput();
-			input.focus();
-			fireEvent.change( input, { target: { value: '-10  %' } } );
-			fireKeyDown( { keyCode: ENTER } );
-
-			expect( state ).toBe( '-10%' );
-		} );
-
-		it( 'should parse REM unit from input', () => {
-			render(
-				<UnitControl
-					value={ state }
-					onChange={ setState }
-					isPressEnterToChange
-				/>
-			);
-
-			const input = getInput();
-			input.focus();
-			fireEvent.change( input, {
-				target: { value: '123       rEm  ' },
-			} );
-			fireKeyDown( { keyCode: ENTER } );
-
-			expect( state ).toBe( '123rem' );
-		} );
-
 		it( 'should update unit after initial render and with new unit prop', () => {
 			const { rerender } = render( <UnitControl value={ '10%' } /> );
 
