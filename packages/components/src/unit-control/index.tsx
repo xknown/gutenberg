@@ -2,11 +2,10 @@
  * External dependencies
  */
 import type {
-	FocusEventHandler,
 	KeyboardEvent,
 	ForwardedRef,
-	SyntheticEvent,
 	ChangeEvent,
+	MutableRefObject,
 } from 'react';
 import { noop, omit } from 'lodash';
 import classnames from 'classnames';
@@ -16,14 +15,11 @@ import classnames from 'classnames';
  */
 import { forwardRef, useMemo, useRef, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { ENTER } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
  */
 import type { WordPressComponentProps } from '../ui/context';
-import * as inputControlActionTypes from '../input-control/reducer/actions';
-import { composeStateReducers } from '../input-control/reducer/reducer';
 import { Root, ValueInput } from './styles/unit-control-styles';
 import UnitSelectControl from './unit-select-control';
 import {
@@ -34,7 +30,6 @@ import {
 } from './utils';
 import { useControlledState } from '../utils/hooks';
 import type { UnitControlProps, UnitControlOnChangeCallback } from './types';
-import type { StateReducer } from '../input-control/reducer/state';
 
 function UnitControl(
 	{
@@ -62,10 +57,18 @@ function UnitControl(
 	// ensures it fallback to `undefined` in case a consumer of `UnitControl`
 	// still passes `null` as a `value`.
 	const nonNullValueProp = valueProp ?? undefined;
-	const units = useMemo(
-		() => getUnitsWithCurrentUnit( nonNullValueProp, unitProp, unitsProp ),
-		[ nonNullValueProp, unitProp, unitsProp ]
-	);
+	const [ units, reFirstCharacterOfUnits ] = useMemo( () => {
+		const list = getUnitsWithCurrentUnit(
+			nonNullValueProp,
+			unitProp,
+			unitsProp
+		);
+		const firstCharacters = list.reduce( ( carry, { value } ) => {
+			const first = value.substr( 0, 1 );
+			return carry.includes( first ) ? carry : `${ carry }|${ first }`;
+		}, list[ 0 ].value.substr( 0, 1 ) );
+		return [ list, new RegExp( `^(?:${ firstCharacters })$` ) ];
+	}, [ nonNullValueProp, unitProp, unitsProp ] );
 	const [ parsedQuantity, parsedUnit ] = getParsedQuantityAndUnit(
 		nonNullValueProp,
 		unitProp,
@@ -83,9 +86,6 @@ function UnitControl(
 	useEffect( () => {
 		setUnit( parsedUnit );
 	}, [ parsedUnit ] );
-
-	// Stores parsed value for hand-off in state reducer.
-	const refParsedQuantity = useRef< number | undefined >( undefined );
 
 	const classes = classnames( 'components-unit-control', className );
 
@@ -134,75 +134,24 @@ function UnitControl(
 		setUnit( nextUnitValue );
 	};
 
-	const mayUpdateUnit = ( event: SyntheticEvent< HTMLInputElement > ) => {
-		if ( ! isNaN( Number( event.currentTarget.value ) ) ) {
-			refParsedQuantity.current = undefined;
-			return;
-		}
-		const [
-			validParsedQuantity,
-			validParsedUnit,
-		] = getValidParsedQuantityAndUnit(
-			event.currentTarget.value,
-			units,
-			parsedQuantity,
-			unit
-		);
-
-		refParsedQuantity.current = validParsedQuantity;
-
-		if ( isPressEnterToChange && validParsedUnit !== unit ) {
-			const data = Array.isArray( units )
-				? units.find( ( option ) => option.value === validParsedUnit )
-				: undefined;
-			const changeProps = { event, data };
-
-			onChange(
-				`${ validParsedQuantity ?? '' }${ validParsedUnit }`,
-				changeProps
-			);
-			onUnitChange( validParsedUnit, changeProps );
-
-			setUnit( validParsedUnit );
-		}
-	};
-
-	const handleOnBlur: FocusEventHandler< HTMLInputElement > = mayUpdateUnit;
-
-	const handleOnKeyDown = ( event: KeyboardEvent< HTMLInputElement > ) => {
-		const { keyCode } = event;
-		if ( keyCode === ENTER ) {
-			mayUpdateUnit( event );
-		}
-	};
-
-	/**
-	 * "Middleware" function that intercepts updates from InputControl.
-	 * This allows us to tap into actions to transform the (next) state for
-	 * InputControl.
-	 *
-	 * @param  state  State from InputControl
-	 * @param  action Action triggering state change
-	 * @return The updated state to apply to InputControl
-	 */
-	const unitControlStateReducer: StateReducer = ( state, action ) => {
-		/*
-		 * On commits (when pressing ENTER and on blur if
-		 * isPressEnterToChange is true), if a parse has been performed
-		 * then use that result to update the state.
-		 */
-		if ( action.type === inputControlActionTypes.COMMIT ) {
-			if ( refParsedQuantity.current !== undefined ) {
-				state.value = ( refParsedQuantity.current ?? '' ).toString();
-				refParsedQuantity.current = undefined;
+	let handleOnKeyDown;
+	if ( ! disableUnits && isUnitSelectTabbable && units.length ) {
+		handleOnKeyDown = ( event: KeyboardEvent< HTMLInputElement > ) => {
+			props.onKeyDown?.( event );
+			// Does the key match the first character of any units?
+			if ( reFirstCharacterOfUnits.test( event.key ) ) {
+				// moves focus to the UnitSelectControl
+				refInputSuffix.current?.focus();
 			}
-		}
+		};
+	}
 
-		return state;
-	};
-
+	const refInputSuffix: MutableRefObject<
+		HTMLSelectElement | undefined
+	> = useRef();
 	const inputSuffix = ! disableUnits ? (
 		<UnitSelectControl
+			ref={ refInputSuffix }
 			aria-label={ __( 'Select unit' ) }
 			disabled={ disabled }
 			isUnitSelectTabbable={ isUnitSelectTabbable }
@@ -228,7 +177,6 @@ function UnitControl(
 		<Root className="components-unit-control-wrapper" style={ style }>
 			<ValueInput
 				aria-label={ label }
-				type={ isPressEnterToChange ? 'text' : 'number' }
 				{ ...omit( props, [ 'children' ] ) }
 				autoComplete={ autoComplete }
 				className={ classes }
@@ -236,7 +184,6 @@ function UnitControl(
 				disableUnits={ disableUnits }
 				isPressEnterToChange={ isPressEnterToChange }
 				label={ label }
-				onBlur={ handleOnBlur }
 				onKeyDown={ handleOnKeyDown }
 				onChange={ handleOnQuantityChange }
 				ref={ forwardedRef }
@@ -244,10 +191,6 @@ function UnitControl(
 				suffix={ inputSuffix }
 				value={ parsedQuantity ?? '' }
 				step={ step }
-				__unstableStateReducer={ composeStateReducers(
-					unitControlStateReducer,
-					stateReducer
-				) }
 			/>
 		</Root>
 	);
