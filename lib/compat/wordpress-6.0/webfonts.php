@@ -83,6 +83,7 @@ function wp_register_webfonts( array $webfonts = array() ) {
  * If the font file is contained within the theme:
  * ```
  * wp_register_webfont(
+ *      'source-serif-pro-normal',
  *      array(
  *          'provider'    => 'local',
  *          'font_family' => 'Source Serif Pro',
@@ -95,11 +96,43 @@ function wp_register_webfonts( array $webfonts = array() ) {
  *
  * @since 6.0.0
  *
- * @param array $webfont Webfont to be registered.
+ * @param string $id The webfont id.
+ * @param array  $webfont Webfont to be registered.
+ *                        See {@see WP_Webfonts_Registry::register()} for a list of supported arguments.
+ */
+function wp_register_webfont( string $id, array $webfont ) {
+	wp_webfonts()->register_font( $id, $webfont );
+}
+
+/**
+ * Enqueue a single webfont.
+ *
+ * Register the webfont if $webfont is provided and enqueues.
+ *
+ * Example of how to register Source Serif Pro font with font-weight range of 200-900:
+ *
+ * If the font file is contained within the theme:
+ * ```
+ * wp_enqueue_webfont(
+ *      'source-serif-pro-normal',
+ *      array(
+ *          'provider'    => 'local',
+ *          'font_family' => 'Source Serif Pro',
+ *          'font_weight' => '200 900',
+ *          'font_style'  => 'normal',
+ *          'src'         => get_theme_file_uri( 'assets/fonts/source-serif-pro/SourceSerif4Variable-Roman.ttf.woff2' ),
+ *      )
+ * );
+ * ```
+ *
+ * @since 6.0.0
+ *
+ * @param string     $id The webfont id.
+ * @param array|null $webfont Webfont to be enqueued. Can be omitted if the font was registered beforehand.
  *                       See {@see WP_Webfonts_Registry::register()} for a list of supported arguments.
  */
-function wp_register_webfont( array $webfont ) {
-	wp_webfonts()->register_font( $webfont );
+function wp_enqueue_webfont( string $id, array $webfont = null ) {
+	wp_webfonts()->enqueue_font( $id, $webfont );
 }
 
 /**
