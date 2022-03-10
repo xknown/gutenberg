@@ -6,6 +6,5 @@ export const PREFERENCES_DEFAULTS = {
 		},
 	},
 	hiddenBlockTypes: [],
-	preferredStyleVariations: {},
 	localAutosaveInterval: 15,
 };
