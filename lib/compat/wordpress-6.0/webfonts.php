@@ -63,8 +63,6 @@ function wp_webfonts() {
  * @param array $webfonts Webfonts to be registered.
  *                        This contains an array of webfonts to be registered.
  *                        Each webfont is an array.
- *                        See {@see WP_Webfonts_Registry::register()} for a list of
- *                        supported arguments for each webfont.
  */
 function wp_register_webfonts( array $webfonts = array() ) {
 	foreach ( $webfonts as $webfont ) {
@@ -98,7 +96,6 @@ function wp_register_webfonts( array $webfonts = array() ) {
  *
  * @param string $id The webfont id.
  * @param array  $webfont Webfont to be registered.
- *                        See {@see WP_Webfonts_Registry::register()} for a list of supported arguments.
  */
 function wp_register_webfont( string $id, array $webfont ) {
 	wp_webfonts()->register_font( $id, $webfont );
@@ -141,8 +138,6 @@ function wp_register_webfont( string $id, array $webfont ) {
  * @param array $webfonts Webfonts to be enqueued.
  *                        This contains an array of webfonts to be enqueued.
  *                        Each webfont is an array.
- *                        See {@see WP_Webfonts_Registry::register()} for a list of
- *                        supported arguments for each webfont.
  */
 function wp_enqueue_webfonts( array $webfonts = array() ) {
 	foreach ( $webfonts as $webfont ) {
@@ -183,7 +178,6 @@ function wp_enqueue_webfonts( array $webfonts = array() ) {
  *
  * @param string     $id The webfont id.
  * @param array|null $webfont Webfont to be enqueued. Can be omitted if the font was registered beforehand.
- *                       See {@see WP_Webfonts_Registry::register()} for a list of supported arguments.
  */
 function wp_enqueue_webfont( string $id, array $webfont = null ) {
 	wp_webfonts()->enqueue_font( $id, $webfont );
