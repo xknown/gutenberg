@@ -221,14 +221,15 @@ export const updatePreferredStyleVariations = ( blockName, blockStyle ) => ( {
 				'preferredStyleVariations',
 				updatedVariations
 			);
+	} else {
+		// Else add the variation.
+		registry
+			.dispatch( preferencesStore )
+			.set( 'core/edit-post', 'preferredStyleVariations', {
+				...existingVarations,
+				[ blockName ]: blockStyle,
+			} );
 	}
-
-	registry
-		.dispatch( preferencesStore )
-		.set( 'core/edit-post', 'preferredStyleVariations', {
-			...existingVarations,
-			[ blockName ]: blockStyle,
-		} );
 };
 
 /**
